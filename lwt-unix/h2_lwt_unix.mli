@@ -72,6 +72,16 @@ module Server : sig
       -> Unix.sockaddr
       -> Lwt_unix.file_descr
       -> unit Lwt.t
+
+    val create_connection_handler_with_default_with_context
+      :  server_ctx:Ssl.context
+      -> ?config:Config.t
+      -> request_handler:(Lwt_ssl.socket -> Unix.sockaddr -> Server_connection.request_handler)
+      -> error_handler:(Unix.sockaddr -> Server_connection.error_handler)
+      -> Unix.sockaddr
+      -> Lwt_unix.file_descr
+      -> unit Lwt.t
+
   end
 end
 
@@ -109,5 +119,15 @@ module Client : sig
       -> error_handler:Client_connection.error_handler
       -> Lwt_unix.file_descr
       -> t Lwt.t
+
+    val create_connection_with_default_with_context
+      :  ?config:Config.t
+      -> ?push_handler:
+           (Request.t -> (Client_connection.response_handler, unit) result)
+      -> error_handler:Client_connection.error_handler
+      -> Lwt_unix.file_descr
+      -> Ssl.context
+      -> t Lwt.t
+
   end
 end

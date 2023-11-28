@@ -86,6 +86,27 @@ module Server = struct
           ~error_handler
           client_addr
           ssl_server
+
+    let create_connection_handler_with_default_with_context
+        ~server_ctx
+        ?config
+        ~request_handler
+        ~error_handler
+      =
+      let make_ssl_server =
+        Gluten_lwt_unix.Server.SSL.create_default_with_context
+          ~alpn_protocols:[ "h2" ]
+          ~server_ctx
+      in
+      fun client_addr socket ->
+        make_ssl_server client_addr socket >>= fun ssl_server ->
+        create_connection_handler
+          ?config
+          ~request_handler:(request_handler ssl_server)
+          ~error_handler
+          client_addr
+          ssl_server
+
   end
 end
 
@@ -118,5 +139,16 @@ module Client = struct
       Gluten_lwt_unix.Client.SSL.create_default ~alpn_protocols:[ "h2" ] socket
       >>= fun ssl_client ->
       create_connection ?config ?push_handler ~error_handler ssl_client
+
+    let create_connection_with_default_with_context
+        ?config
+        ?push_handler
+        ~error_handler
+        socket ssl_context
+      =
+      Gluten_lwt_unix.Client.SSL.create_default_with_context ~alpn_protocols:[ "h2" ] socket ssl_context 
+      >>= fun ssl_client ->
+      create_connection ?config ?push_handler ~error_handler ssl_client
+
   end
 end

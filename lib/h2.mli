@@ -949,4 +949,5 @@ module Client_connection : sig
       [`Close _] and {!next_write_operation} will do the same will return a
       [`Write _] until all buffered output has been flushed, at which point it
       will return [`Close]. *)
+
 end

@@ -93,4 +93,5 @@ module Client (Client_runtime : Gluten_lwt.Client) = struct
 
   let shutdown t = Client_runtime.shutdown t.runtime
   let is_closed t = Client_runtime.is_closed t.runtime
+  let socket t = Client_runtime.socket t.runtime
 end
